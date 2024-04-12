@@ -2,7 +2,8 @@
 import {computed, defineComponent} from 'vue'
 import Temporizador from "@/components/Temporizador.vue";
 import {useStore} from "vuex";
-import {key} from "@/store";
+import {key, store} from "@/store";
+import {TipoNotificacao} from "@/interfaces/INotificacao";
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -17,6 +18,14 @@ export default defineComponent({
   },
   methods: {
     finalizarTarefa(tempoDecorrido: number): void {
+      if(!this.idProjeto){
+        store.commit('NOTIFICAR', {
+          tipo: TipoNotificacao.FALHA,
+          titulo: 'Projeto não selecionado',
+          texto: 'Selecione um projeto para salvar a tarefa'
+        })
+        return
+      }
       this.$emit('salvarTarefa', {
           descricao: this.descricaoTarefa,
           duracaoEmSegundos: tempoDecorrido,

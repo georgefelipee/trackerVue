@@ -1,6 +1,10 @@
 <script lang="ts">
-import { defineComponent} from 'vue'
+import {defineComponent} from 'vue'
 import {useStore} from "@/store";
+import {ADD_PROJETO, ALTERAR_PROJETO} from "@/store/tipo-mutacoes";
+import {TipoNotificacao} from "@/interfaces/INotificacao";
+import useNotificador from "@/hooks/notificador";
+
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Formulario",
@@ -23,20 +27,21 @@ export default defineComponent({
   methods: {
     salvar(){
       if(this.id){
-        this.store.commit('ALTERAR_PROJETO', {id: this.id, nome: this.nomeDoProjeto})
-        this.nomeDoProjeto = '';
-        this.$router.push('/projetos');
+        this.store.commit(ALTERAR_PROJETO, {id: this.id, nome: this.nomeDoProjeto})
       }else{
-        this.store.commit('ADD_PROJETO', this.nomeDoProjeto)
-        this.nomeDoProjeto = '';
-        this.$router.push('/projetos');
+        this.store.commit(ADD_PROJETO, this.nomeDoProjeto)
       }
+      this.notificar(TipoNotificacao.SUCESSO, 'Projeto', 'Projeto salvo com sucesso')
+      this.nomeDoProjeto = '';
+      this.$router.push('/projetos');
     }
   },
   setup(){
     const store = useStore()
+    const { notificar } = useNotificador()
     return{
       store,
+      notificar
     }
   }
 })
