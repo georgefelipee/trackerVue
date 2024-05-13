@@ -1,10 +1,11 @@
 import {IProjeto} from "@/interfaces/IProjeto";
 import {createStore, Store, useStore as vuexUseStore} from "vuex";
 import {InjectionKey} from "vue";
-import {ADD_PROJETO, ALTERAR_PROJETO, EXCLUIR_PROJETO, NOTIFICAR} from "@/store/tipo-mutacoes";
+import {ADD_PROJETO, ALTERAR_PROJETO, DEFINIR_PROJETOS, EXCLUIR_PROJETO, NOTIFICAR} from "@/store/tipo-mutacoes";
 import {INotificacao, TipoNotificacao} from "@/interfaces/INotificacao";
 import notificacoes from "@/components/Notificacoes.vue";
-
+import {OBTER_PROJETOS} from "@/store/tipo-actions";
+import clientHttp from "@/http";
 interface Estado {
     projetos: IProjeto[],
     notificacoes: INotificacao[]
@@ -32,6 +33,9 @@ export const store = createStore<Estado>({
         [EXCLUIR_PROJETO](state, id: string){
             state.projetos = state.projetos.filter(proj => proj.id !== id)
         },
+        [DEFINIR_PROJETOS](state, projetos: IProjeto[]){
+            state.projetos = projetos;
+        },
         [NOTIFICAR](state, novaNotificacao: INotificacao){
 
             novaNotificacao.id = new Date().getTime();
@@ -46,6 +50,14 @@ export const store = createStore<Estado>({
 
                 console.log("Removendo notificação", state.notificacoes)
             },5000)
+        }
+    },
+    actions: {
+        [OBTER_PROJETOS] ({commit}){
+            clientHttp.get('projetos')
+                .then(res => {
+                    commit(DEFINIR_PROJETOS,res.data)
+                })
         }
     }
 })
