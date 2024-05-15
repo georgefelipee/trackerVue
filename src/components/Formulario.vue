@@ -31,6 +31,7 @@ export default defineComponent({
           duracaoEmSegundos: tempoDecorrido,
           projeto: this.projetos.find(proj => proj.id == this.idProjeto)
         })
+
       this.descricaoTarefa = ''
     }
   },
@@ -38,7 +39,7 @@ export default defineComponent({
 
     const store = useStore(key)
     return {
-      projetos: computed(() => store.state.projetos)
+      projetos: computed(() => store.state.projeto.projetos)
     }
   }
 })

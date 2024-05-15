@@ -1,47 +1,51 @@
 <script lang="ts">
-import {defineComponent} from 'vue'
+import {defineComponent, ref} from 'vue'
 import {useStore} from "@/store";
-import {ADD_PROJETO, ALTERAR_PROJETO} from "@/store/tipo-mutacoes";
 import {TipoNotificacao} from "@/interfaces/INotificacao";
 import useNotificador from "@/hooks/notificador";
+import {ALTERAR_PROJETO_ASYNC, CADASTRAR_PROJETO} from "@/store/tipo-actions";
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Formulario",
-  data () {
-    return {
-      nomeDoProjeto: '',
-    }
-  },
   props: {
     id: {
       type: String,
     }
   },
-  mounted () {
-    if(this.id){
-      const projeto = this.store.state.projetos.find(proj => proj.id === this.id)
-      this.nomeDoProjeto = projeto?.nome || ''
-    }
-  },
   methods: {
     salvar(){
       if(this.id){
-        this.store.commit(ALTERAR_PROJETO, {id: this.id, nome: this.nomeDoProjeto})
+        this.store.dispatch(ALTERAR_PROJETO_ASYNC, {id: this.id, nome: this.nomeDoProjeto})
+            .then(() => {this.lidaComSucesso()})
       }else{
-        this.store.commit(ADD_PROJETO, this.nomeDoProjeto)
+        this.store.dispatch(CADASTRAR_PROJETO , this.nomeDoProjeto)
+            .then(() => {this.lidaComSucesso()})
       }
-      this.notificar(TipoNotificacao.SUCESSO, 'Projeto', 'Projeto salvo com sucesso')
       this.nomeDoProjeto = '';
       this.$router.push('/projetos');
+    },
+    lidaComSucesso(){
+      this.nomeDoProjeto = "";
+      this.notificar(TipoNotificacao.SUCESSO, 'Excelente', 'Projeto salvo com sucesso')
+      this.$router.push('/projetos')
     }
   },
-  setup(){
+  setup(props){
     const store = useStore()
     const { notificar } = useNotificador()
+    const nomeDoProjeto = ref("")
+
+    if(props.id){
+      const projeto = store.state.projeto.projetos
+          .find(proj => proj.id === props.id)
+      nomeDoProjeto.value = projeto?.nome || ''
+    }
+
     return{
       store,
-      notificar
+      notificar,
+      nomeDoProjeto
     }
   }
 })

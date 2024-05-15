@@ -1,9 +1,23 @@
 {
   "projetos": [
-
     {
-      "id": 1,
-      "nome": "Projeto 4"
+      "nome": "teste1",
+      "id": "8edc"
+    },
+    {
+      "id": "0b0c",
+      "nome": "vuex"
+    }
+  ],
+  "tarefas": [
+    {
+      "id": "011e",
+      "descricao": "refatorar vuex edit",
+      "duracaoEmSegundos": 2,
+      "projeto": {
+        "id": "0b0c",
+        "nome": "vuex"
+      }
     }
   ]
 }
