@@ -1,5 +1,5 @@
 <script lang="ts">
-import {computed, defineComponent} from 'vue'
+import {computed, defineComponent, ref} from 'vue'
 import Temporizador from "@/components/Temporizador.vue";
 import {useStore} from "vuex";
 import {key, store} from "@/store";
@@ -10,36 +10,36 @@ export default defineComponent({
   name: "Formulario",
   emits: ['salvarTarefa'],
   components: {Temporizador,},
-  data() {
-    return {
-      descricaoTarefa: '',
-      idProjeto: ''
-    }
-  },
-  methods: {
-    finalizarTarefa(tempoDecorrido: number): void {
-      if(!this.idProjeto){
-        store.commit('NOTIFICAR', {
-          tipo: TipoNotificacao.FALHA,
-          titulo: 'Projeto não selecionado',
-          texto: 'Selecione um projeto para salvar a tarefa'
-        })
-        return
-      }
-      this.$emit('salvarTarefa', {
-          descricao: this.descricaoTarefa,
-          duracaoEmSegundos: tempoDecorrido,
-          projeto: this.projetos.find(proj => proj.id == this.idProjeto)
-        })
-
-      this.descricaoTarefa = ''
-    }
-  },
-  setup() {
-
+  setup(props, {emit}) {
     const store = useStore(key)
+
+    const descricaoTarefa = ref("")
+    const idProjeto = ref('')
+
+    const projetos = computed(() => store.state.projeto.projetos)
+
+    const finalizarTarefa = (tempoDecorrido: number): void => {
+      if(!idProjeto.value){
+      store.commit('NOTIFICAR', {
+        tipo: TipoNotificacao.FALHA,
+        titulo: 'Projeto não selecionado',
+        texto: 'Selecione um projeto para salvar a tarefa'
+      })
+      return
+    }
+    emit('salvarTarefa', {
+      descricao: descricaoTarefa,
+      duracaoEmSegundos: tempoDecorrido,
+      projeto: projetos.value.find(proj => proj.id == idProjeto.value)
+    })
+
+    descricaoTarefa.value = ''
+  }
     return {
-      projetos: computed(() => store.state.projeto.projetos)
+      projetos: computed(() => store.state.projeto.projetos),
+      descricaoTarefa,
+      idProjeto,
+      finalizarTarefa
     }
   }
 })

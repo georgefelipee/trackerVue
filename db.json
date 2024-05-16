@@ -1,22 +1,27 @@
 {
   "projetos": [
     {
-      "nome": "teste1",
-      "id": "8edc"
-    },
-    {
-      "id": "0b0c",
-      "nome": "vuex"
+      "nome": "projeto 1",
+      "id": "c03f"
     }
   ],
   "tarefas": [
     {
       "id": "011e",
-      "descricao": "refatorar vuex edit",
+      "descricao": "refatorar vuex editar",
       "duracaoEmSegundos": 2,
       "projeto": {
         "id": "0b0c",
         "nome": "vuex"
+      }
+    },
+    {
+      "id": "a766",
+      "descricao": "teste de edição",
+      "duracaoEmSegundos": 4,
+      "projeto": {
+        "nome": "teste1",
+        "id": "c03f"
       }
     }
   ]

@@ -4,6 +4,7 @@ import {useStore} from "@/store";
 import {TipoNotificacao} from "@/interfaces/INotificacao";
 import useNotificador from "@/hooks/notificador";
 import {ALTERAR_PROJETO_ASYNC, CADASTRAR_PROJETO} from "@/store/tipo-actions";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -13,25 +14,8 @@ export default defineComponent({
       type: String,
     }
   },
-  methods: {
-    salvar(){
-      if(this.id){
-        this.store.dispatch(ALTERAR_PROJETO_ASYNC, {id: this.id, nome: this.nomeDoProjeto})
-            .then(() => {this.lidaComSucesso()})
-      }else{
-        this.store.dispatch(CADASTRAR_PROJETO , this.nomeDoProjeto)
-            .then(() => {this.lidaComSucesso()})
-      }
-      this.nomeDoProjeto = '';
-      this.$router.push('/projetos');
-    },
-    lidaComSucesso(){
-      this.nomeDoProjeto = "";
-      this.notificar(TipoNotificacao.SUCESSO, 'Excelente', 'Projeto salvo com sucesso')
-      this.$router.push('/projetos')
-    }
-  },
   setup(props){
+    const router = useRouter()
     const store = useStore()
     const { notificar } = useNotificador()
     const nomeDoProjeto = ref("")
@@ -42,9 +26,26 @@ export default defineComponent({
       nomeDoProjeto.value = projeto?.nome || ''
     }
 
+    const lidaComSucesso = () =>{
+      nomeDoProjeto.value = "";
+      notificar(TipoNotificacao.SUCESSO, 'Excelente', 'Projeto salvo com sucesso')
+      router.push('/projetos')
+    }
+
+    const salvar = () => {
+      if(props.id){
+        store.dispatch(ALTERAR_PROJETO_ASYNC, {id: props.id, nome: nomeDoProjeto.value})
+            .then(() => {lidaComSucesso()})
+      }else{
+        store.dispatch(CADASTRAR_PROJETO , nomeDoProjeto.value)
+            .then(() => {lidaComSucesso()})
+      }
+      nomeDoProjeto.value = '';
+      router.push('/projetos');
+    }
+
     return{
-      store,
-      notificar,
+      salvar,
       nomeDoProjeto
     }
   }
